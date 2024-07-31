@@ -11,21 +11,26 @@ const getAddProduct = (req, res, next) => {
 const getEditProduct = (req, res, next) => {
     const productId = req.params.productId;
     const editMode = req.query.edit;
-    Product.findById(productId, product => {
+    Product.findById(productId).then(([rows]) => {
+        const product = rows[0];
         res.render('admin/edit-product', {
             docTitle: 'Edit Product',
             path: '/admin/edit-product',
             product: product,
             editMode: editMode
         });
+    }).catch(error => {
+        console.log(error);
     });
 }
 
 const postAddProduct = (req, res, next) => {
     const {title, imageUrl, price, description} = req.body;
     const product = new Product(null, title, imageUrl, price, description);
-    product.save(() => {
+    product.save().then(() => {
         res.redirect('/admin/products');
+    }).catch(error => {
+        console.log(error);
     });
 };
 
@@ -44,13 +49,15 @@ const postDeleteProduct = (req, res, next) => {
 }
 
 const getAllProducts = (req, res, next) => {
-    Product.fetchAll((products => {
+    Product.fetchAll().then(([rows, fieldData]) => {
         res.render('admin/products', {
-            products: products,
+            products: rows,
             docTitle: 'Admin Products',
             path: '/admin/products'
         });
-    }));
+    }).catch(error => {
+        console.log(error);
+    });
 }
 
 module.exports = {
