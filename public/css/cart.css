@@ -1,0 +1,22 @@
+.cart .cart-items {
+    width: 95%;
+    max-width: 700px;
+    margin: auto;
+}
+
+.cart .cart-item > li {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px;
+    background-color: #FFFFFF;
+    box-shadow: 0px 0px 5px;
+    margin-bottom: 16px;
+}
+
+.cart .cart-item > li > p {
+    margin: 0px;
+    font-size: 18px;
+    font-weight: bold;
+    line-height: 30px;
+}

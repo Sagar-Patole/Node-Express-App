@@ -1,20 +1,19 @@
 <%- include('../includes/head.ejs') %>
-    <link rel="stylesheet" href="/css/forms.css">
     <link rel="stylesheet" href="/css/product.css">
 </head>
 
 <body>
    <%- include('../includes/navigation.ejs') %>
 
-    <main>
+    <main class="container">
         <form class="product-form" action="<% if (editMode) { %>/admin/edit-product<% } else { %>/admin/add-product<% } %>" method="POST">
             <div class="form-control">
                 <label for="title">Title</label>
-                <input type="text" name="title" id="title" value="<% if (editMode) { %><%= product.title %><% } %>">
+                <input type="text" name="title" id="title" value="<% if (editMode) { %><%= product.name %><% } %>">
             </div>
             <div class="form-control">
                 <label for="imageUrl">Image URL</label>
-                <input type="text" name="imageUrl" id="imageUrl" value="<% if (editMode) { %><%= product.imageUrl %><% } %>">
+                <input type="text" name="imageUrl" id="imageUrl" value="<% if (editMode) { %><%= product.image_url %><% } %>">
             </div>
             <div class="form-control">
                 <label for="price">Price</label>
@@ -29,8 +28,9 @@
                     <input type="hidden" name="productId" value="<%= product.id %>">
                 </div>
             <% } %>
-
-            <button class="btn" type="submit"><% if (editMode) { %>Update Product<% } else { %>Add Product<% } %></button>
+            <div class="centered">
+                <button class="btn btn-primary" type="submit"><% if (editMode) { %>Update Product<% } else { %>Add Product<% } %></button>
+            </div>
         </form>
     </main>
 <%- include('../includes/end.ejs') %>

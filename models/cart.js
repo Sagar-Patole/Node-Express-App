@@ -1,71 +1,44 @@
-const fs = require('fs');
-const path = require('path');
-
-const rootDir = require('../utils/path');
-const Product = require('./product');
-
-const p = path.join(rootDir, 'data', 'cart.json');
+const db = require('../utils/database');
 
 class Cart {
-    static addProduct = (id, productPrice, cb) => {
-        fs.readFile(p, (error, fileContent) => {
-            let cart = {products: [], totalPrice: 0.00}
-            if (!error) {
-                cart = JSON.parse(fileContent);
-            }
-            const existingProductIndex = cart.products.findIndex(p => p.id === id);
-            const existingProduct = cart.products[existingProductIndex];
-            let updatedProduct;
-            if (existingProduct) {
-                updatedProduct = {...existingProduct, quantity: existingProduct.quantity + 1};
-                cart.products[existingProductIndex] = updatedProduct;
-            } else {
-                updatedProduct = {id: id, quantity: 1};
-                cart.products = [...cart.products, updatedProduct];
-            }
-            cart.totalPrice = parseFloat((cart.totalPrice + parseFloat(productPrice)).toFixed(2));
-
-            fs.writeFile(p, JSON.stringify(cart), (err) => {
-                if (err) {
-                    console.log(err);
-                } else {
-                    cb();
-                }
-            });
-        });
+    constructor(userId) {
+        this.userId = userId
     }
 
-    static deleteProduct = (id, productPrice, cb) => {
-        fs.readFile(p, (error, fileContent) => {
-            if (error) {
-                return;
-            } else {
-                const updatedCart = { ...JSON.parse(fileContent) };
-                const product = updatedCart.products.find(p => p.id === id);
-                if (!product) {
-                    return cb();
-                }
-                updatedCart.products = updatedCart.products.filter(p => p.id !== id);
-                updatedCart.totalPrice = parseFloat((updatedCart.totalPrice - (parseFloat(productPrice) * product.quantity)).toFixed(2));
-                fs.writeFile(p, JSON.stringify(updatedCart), (err, data) => {
-                    if (err) {
-                        console.log(err);
-                    } else {
-                        cb();
-                    }
-                });
-            }
-        });
+    save = () => {
+        return db.execute('INSERT INTO carts (user_id) VALUES (?)', [this.userId]);
     }
 
-    static getCart = (cb) => {
-        fs.readFile(p, (error, fileContent) => {
-            if (error) {
-                cb({});
+    static findById = (userId) => {
+        return db.execute('SELECT * FROM carts WHERE user_id = ?', [userId]);
+    }
+
+    static getCart = (cartId) => {
+        return db.execute(`SELECT carts.id AS cart_id, products.id AS product_id, products.name, products.price, cart_items.quantity FROM carts
+            INNER JOIN cart_items ON carts.id = cart_items.cart_id
+            INNER JOIN products ON cart_items.product_id = products.id
+            WHERE carts.id = ?`, [cartId]);
+    }
+
+    static addProduct = async (cartId, productId) => {
+        try {
+            const [cartItems, cartItemsFieldData] = await db.execute('SELECT * FROM cart_items WHERE cart_id = ? AND product_id = ?', [cartId, productId]);
+            if (cartItems.length > 0) {
+                await db.execute('UPDATE cart_items SET quantity = ? WHERE cart_id = ? AND product_id = ?', [cartItems[0].quantity + 1, cartId, productId]);
             } else {
-                cb(JSON.parse(fileContent));
+                await db.execute('INSERT INTO cart_items (cart_id, product_id, quantity) VALUES (?, ?, ?)', [cartId, productId, 1]);
             }
-        });
+        } catch (error) {
+            console.log(error);
+        }
+    }
+
+    static deleteProduct = (cartId, productId) => {
+        return db.execute('DELETE FROM cart_items WHERE cart_id = ? AND product_id = ?', [cartId, productId]);
+    }
+
+    static clearCart = (cartId) => {
+        return db.execute('DELETE FROM cart_items WHERE cart_id = ?', [cartId]);
     }
 }
 

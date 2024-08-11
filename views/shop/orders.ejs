@@ -1,10 +1,38 @@
 <%- include('../includes/head.ejs') %>
+    <link rel="stylesheet" href="/css/order.css">
 </head>
 
 <body>
     <%- include('../includes/navigation.ejs') %>
 
-    <main>
-        <h1>Nothing There!</h1>
+    <main class="container">
+        <div class="orders">
+            <% if (orders.length > 0) { %>
+                <div class="orders-wrapper">
+                    <ul>
+                        <% for (order of orders) { %>
+                            <div class="order">
+                                <li>
+                                    <p>Order - #<%= order.id %></p>
+                                    <% for (orderItem of order.orderItems) { %>
+                                        <div class="order-items">
+                                            <ul>
+                                                <div class="order-item">
+                                                    <li>
+                                                        <p><%= orderItem.product.name %> (<%= orderItem.productQuantity %>)</p>
+                                                    </li>
+                                                </div>
+                                            </ul>
+                                        </div>
+                                    <% } %>
+                                </li>
+                            </div>
+                        <% } %>
+                    </ul>
+                </div>
+            <% } else { %>
+                <h1>Nothing there!</h1>
+            <% } %>
+        </div>
     </main>
 <%- include('../includes/end.ejs') %>

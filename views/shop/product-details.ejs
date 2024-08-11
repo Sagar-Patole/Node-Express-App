@@ -5,14 +5,16 @@
 <body>
     <%- include('../includes/navigation.ejs') %>
 
-    <main class="centered product-details">
-        <h1><%= product.title %></h1>
-        <hr>
-        <div>
-            <img src="<%= product.imageUrl %>" alt="<%= product.title%>">
+    <main class="container">
+        <div class="centered product-details">
+            <h1><%= product.name %></h1>
+            <hr>
+            <div>
+                <img src="<%= product.image_url %>" alt="<%= product.name%>">
+            </div>
+            <h2><%= product.price %></h2>
+            <p><%= product.description %></p>
+            <%- include('../includes/add-to-cart.ejs') %>
         </div>
-        <h2><%= product.price %></h2>
-        <p><%= product.description %></p>
-        <%- include('../includes/add-to-cart.ejs') %>
     </main>
 <%- include('../includes/end.ejs') %>
