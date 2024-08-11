@@ -1,0 +1,26 @@
+.orders .orders-wrapper {
+    width: 95%;
+    max-width: 700px;
+    margin: auto;
+}
+
+.orders .order > li {
+    display: block;
+    padding: 16px;
+    background-color: #FFFFFF;
+    box-shadow: 0px 0px 5px;
+    margin-bottom: 16px;
+}
+
+.orders .order > li > p {
+    margin: 0px;
+    font-size: 18px;
+    font-weight: bold;
+    line-height: 30px;
+}
+
+.orders .order-item > li > p {
+    margin: 0px;
+    font-size: 18px;
+    line-height: 30px;
+}

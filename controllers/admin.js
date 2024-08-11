@@ -1,6 +1,6 @@
 const Product = require('../models/product');
 
-const getAddProduct = (req, res, next) => {
+exports.getAddProduct = (req, res, next) => {
     res.render('admin/edit-product', {
         docTitle: 'Add Product',
         path: '/admin/add-product',
@@ -8,7 +8,7 @@ const getAddProduct = (req, res, next) => {
     });
 };
 
-const getEditProduct = (req, res, next) => {
+exports.getEditProduct = (req, res, next) => {
     const productId = req.params.productId;
     const editMode = req.query.edit;
     Product.findById(productId).then(([rows]) => {
@@ -24,9 +24,10 @@ const getEditProduct = (req, res, next) => {
     });
 }
 
-const postAddProduct = (req, res, next) => {
+exports.postAddProduct = (req, res, next) => {
+    const userId = req.user.id;
     const {title, imageUrl, price, description} = req.body;
-    const product = new Product(null, title, imageUrl, price, description);
+    const product = new Product(null, title, imageUrl, price, description, userId);
     product.save().then(() => {
         res.redirect('/admin/products');
     }).catch(error => {
@@ -34,22 +35,26 @@ const postAddProduct = (req, res, next) => {
     });
 };
 
-const postEditProduct = (req, res, next) => {
+exports.postEditProduct = (req, res, next) => {
     const {productId, title, imageUrl, price, description} = req.body;
     const product = new Product(productId, title, imageUrl, price, description);
-    product.save(() => {
+    product.save().then(() => {
         res.redirect('/admin/products');
+    }).catch(error => {
+        console.log(error);
     });
 }
 
-const postDeleteProduct = (req, res, next) => {
-    Product.deleteById(req.body.productId, () => {
+exports.postDeleteProduct = (req, res, next) => {
+    Product.deleteById(req.body.productId).then(() => {
         res.redirect('/admin/products');
+    }).catch(error => {
+        console.log(error);
     });
 }
 
-const getAllProducts = (req, res, next) => {
-    Product.fetchAll().then(([rows, fieldData]) => {
+exports.getAllProducts = (req, res, next) => {
+    Product.fetchAll(req.user.id).then(([rows, fieldData]) => {
         res.render('admin/products', {
             products: rows,
             docTitle: 'Admin Products',
@@ -58,13 +63,4 @@ const getAllProducts = (req, res, next) => {
     }).catch(error => {
         console.log(error);
     });
-}
-
-module.exports = {
-    getAddProduct: getAddProduct,
-    getEditProduct: getEditProduct,
-    postAddProduct: postAddProduct,
-    postEditProduct: postEditProduct,
-    postDeleteProduct: postDeleteProduct,
-    getAllProducts: getAllProducts
 }

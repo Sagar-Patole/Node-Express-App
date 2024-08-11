@@ -1,10 +1,12 @@
 const mysql = require('mysql2');
 
+const config = require('../config/config');
+
 const pool = mysql.createPool({
-    host: 'localhost',
-    database: 'express-app',
-    user: 'root',
-    password: 'root'
+    host: config.host,
+    database: config.database,
+    user: config.username,
+    password: config.password
 });
 
 module.exports = pool.promise();
