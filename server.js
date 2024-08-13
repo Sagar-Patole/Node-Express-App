@@ -1,6 +1,8 @@
 const path = require('path');
 
 const express = require('express');
+const session = require('express-session');
+const MySQLStore = require('express-mysql-session')(session);
 const bodyParser = require('body-parser');
 
 const config = require('./config/config');
@@ -10,30 +12,39 @@ const User = require('./models/user');
 const Cart = require('./models/cart');
 const adminRoutes = require('./routes/admin');
 const shopRoutes = require('./routes/shop');
+const authRoutes = require('./routes/auth');
 const errorController = require('./controllers/error');
 
 const app = express();
+const sessionStore = new MySQLStore({
+    expiration: 86400000,
+    createDatabaseTable: true,
+    schema: {
+        tableName: 'sessions',
+        columnNames: {
+            session_id: 'session_id',
+            expires: 'expires',
+            data: 'data'
+        }
+    }
+}, db);
 
 app.set('view engine', 'ejs');
 app.set('views', 'views');
 
 app.use(bodyParser.urlencoded({extended: false}));
 app.use(express.static(path.join(rootDir, 'public')));
-
-app.use(async (req, res, next) => {
-    try {
-        const [userData, userFieldData] = await User.findById(2);
-        const [cartData, cartFieldData] = await Cart.findById(userData[0].id);
-        req.user = userData[0];
-        req.user.cartId = cartData[0].id;
-        next();
-    } catch (error) {
-        console.log(error);
-    }
-});
+app.use(session({
+    secret: 'My secret key',
+    resave: false,
+    saveUninitialized: false,
+    store: sessionStore,
+    cookie: {secure: false, maxAge: 3600000}
+}));
 
 app.use('/admin', adminRoutes);
 app.use(shopRoutes);
+app.use(authRoutes);
 
 app.use(errorController.get404);
 
