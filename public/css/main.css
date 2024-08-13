@@ -64,9 +64,23 @@ ul {
   font-weight: bold;
 }
 
+.main-header__item button {
+  color: #FFFFFF;
+  font-weight: bold;
+  border: none;
+  background: none;
+  font-size: 16px;
+  cursor: pointer;
+}
+
 .main-header__item a:hover,
 .main-header__item a:active,
 .main-header__item a.active {
+  color: #322FFD;
+}
+
+.main-header__item button:hover,
+.main-header__item button:active {
   color: #322FFD;
 }
 
@@ -108,9 +122,25 @@ ul {
   padding: 0.5rem 2rem;
 }
 
+.mobile-nav__item button {
+  color: black;
+  font-size: 1.5rem;
+  padding: 0.5rem 2rem;
+  border: none;
+  background: none;
+  cursor: pointer;
+}
+
 .mobile-nav__item a:active,
 .mobile-nav__item a:hover,
 .mobile-nav__item a.active {
+  background: #322FFD;
+  color: white;
+  border-radius: 3px;
+}
+
+.mobile-nav__item button:active,
+.mobile-nav__item button:hover {
   background: #322FFD;
   color: white;
   border-radius: 3px;
@@ -305,6 +335,12 @@ button:disabled {
   }
 
   #side-menu-toggle {
+    display: none;
+  }
+}
+
+@media (max-width: 480px) {
+  .main-header__nav {
     display: none;
   }
 }

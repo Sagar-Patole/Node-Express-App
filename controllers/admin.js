@@ -4,7 +4,8 @@ exports.getAddProduct = (req, res, next) => {
     res.render('admin/edit-product', {
         docTitle: 'Add Product',
         path: '/admin/add-product',
-        editMode: false
+        editMode: false,
+        isAuthenticated: req.session.isLoggedIn
     });
 };
 
@@ -17,7 +18,8 @@ exports.getEditProduct = (req, res, next) => {
             docTitle: 'Edit Product',
             path: '/admin/edit-product',
             product: product,
-            editMode: editMode
+            editMode: editMode,
+            isAuthenticated: req.session.isLoggedIn
         });
     }).catch(error => {
         console.log(error);
@@ -25,7 +27,7 @@ exports.getEditProduct = (req, res, next) => {
 }
 
 exports.postAddProduct = (req, res, next) => {
-    const userId = req.user.id;
+    const userId = req.session.user.id;
     const {title, imageUrl, price, description} = req.body;
     const product = new Product(null, title, imageUrl, price, description, userId);
     product.save().then(() => {
@@ -54,11 +56,12 @@ exports.postDeleteProduct = (req, res, next) => {
 }
 
 exports.getAllProducts = (req, res, next) => {
-    Product.fetchAll(req.user.id).then(([rows, fieldData]) => {
+    Product.fetchAll(req.session.user.id).then(([rows, fieldData]) => {
         res.render('admin/products', {
             products: rows,
             docTitle: 'Admin Products',
-            path: '/admin/products'
+            path: '/admin/products',
+            isAuthenticated: req.session.isLoggedIn
         });
     }).catch(error => {
         console.log(error);
