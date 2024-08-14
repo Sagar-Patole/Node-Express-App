@@ -4,12 +4,12 @@ const express = require('express');
 const session = require('express-session');
 const MySQLStore = require('express-mysql-session')(session);
 const bodyParser = require('body-parser');
+const csrf = require('csurf');
+const flash = require('connect-flash');
 
 const config = require('./config/config');
 const db = require('./utils/database');
 const rootDir = require('./utils/path');
-const User = require('./models/user');
-const Cart = require('./models/cart');
 const adminRoutes = require('./routes/admin');
 const shopRoutes = require('./routes/shop');
 const authRoutes = require('./routes/auth');
@@ -29,6 +29,8 @@ const sessionStore = new MySQLStore({
     }
 }, db);
 
+const csrfProtection = csrf();
+
 app.set('view engine', 'ejs');
 app.set('views', 'views');
 
@@ -41,35 +43,22 @@ app.use(session({
     store: sessionStore,
     cookie: {secure: false, maxAge: 3600000}
 }));
+app.use(csrfProtection);
+app.use(flash());
 
+app.use((req, res, next) => {
+    res.locals.isAuthenticated = req.session.isLoggedIn;
+    res.locals.csrfToken = req.csrfToken();
+    next();
+});
 app.use('/admin', adminRoutes);
 app.use(shopRoutes);
 app.use(authRoutes);
 
 app.use(errorController.get404);
 
-db.getConnection().then( async () => {
-    try {
-        const [userRows, userFieldData] = await User.findById(2);
-        let userData;
-        if (userRows.length > 0) {
-            [userData] = userRows;
-        } else {
-            const user = new User('Sagar', 'test@test.com');
-            [userData] = await user.save();
-        }
-
-        if (userData) {
-            const [cartRows, cartFieldData] = await Cart.findById(userData.id || userData.insertId);
-            if (cartRows.length === 0) {
-                const cart = new Cart(userData.id || userData.insertId);
-                await cart.save();
-            }
-            app.listen(config.port);
-        }
-    } catch (err) {
-        console.log(err);
-    }
+db.getConnection().then(() => {
+    app.listen(config.port);
 }).catch(error => {
     console.log(error);
 });
