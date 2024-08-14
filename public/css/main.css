@@ -329,6 +329,23 @@ button:disabled {
   background: #FF0000;
 }
 
+.notification {
+  width: 20rem;
+  max-width: 90%;
+  margin: 16px auto 0px auto;
+  display: block;
+  border-radius: 6px;
+  padding: 16px;
+  box-shadow: 0px 4px 8px #0000003d;
+  background-color: #FFFFFF;
+  font-size: 16px;
+  line-height: 22px;
+}
+
+.error-notification {
+  border: 1px solid #FF0000;
+}
+
 @media (min-width: 768px) {
   .main-header__nav {
     display: flex;
