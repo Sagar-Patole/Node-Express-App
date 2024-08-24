@@ -1,7 +1,32 @@
 const bcrypt = require('bcrypt');
+const nodemailer = require('nodemailer');
+const { google } = require('googleapis');
 
+const config = require('../config/config')
 const User = require('../models/user');
 const Cart = require('../models/cart');
+
+const oAuth2Client = new google.auth.OAuth2(config.oAuth2.clientId, config.oAuth2.clientSecret, config.oAuth2.redirectUri);
+oAuth2Client.setCredentials({refresh_token: config.oAuth2.refreshToken});
+
+const createTransporter = async () => {
+    try {
+        const accessToken = await oAuth2Client.getAccessToken();
+        return nodemailer.createTransport({
+            service: 'gmail',
+            auth: {
+                type: 'OAuth2',
+                user: config.oAuth2.email,
+                clientId: config.oAuth2.clientId,
+                clientSecret: config.oAuth2.clientSecret,
+                refreshToken: config.oAuth2.refreshToken,
+                accessToken: accessToken.token
+            }
+        });
+    } catch (error) {
+        console.log(error);
+    }
+}
 
 exports.getLogin = (req, res, next) => {
     const message = req.flash('error');
@@ -83,6 +108,13 @@ exports.postSignup = async (req, res, next) => {
             const cart = new Cart(newUserData.insertId);
             await cart.save();
             res.redirect('/login');
+            const transporter = await createTransporter();
+            await transporter.sendMail({
+                to: email,
+                from: `${config.oAuth2.senderName} ${config.oAuth2.email}`,
+                subject: 'Signup succeeded!',
+                html: '<h1>You successfully signed up!</h1>'
+            });
         }
     } catch (error) {
         console.log(error);
