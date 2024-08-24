@@ -58,7 +58,7 @@ app.use(authRoutes);
 app.use(errorController.get404);
 
 db.getConnection().then(() => {
-    app.listen(config.port);
+    app.listen(config.database.port);
 }).catch(error => {
     console.log(error);
 });
