@@ -17,6 +17,18 @@ class User {
     static findByEmail = (email) => {
         return db.execute('SELECT * FROM users WHERE email = ?', [email]);
     }
+
+    static findByResetPasswordToken = (token) => {
+        return db.execute('SELECT * FROM users WHERE reset_password_token = ?', [token]);
+    }
+
+    static saveResetPasswordInfo = (email, resetPasswordToken, resetPasswordTokenExpiration) => {
+        return db.execute('UPDATE users SET reset_password_token = ?, reset_password_token_expiration = ? WHERE email = ?', [resetPasswordToken, resetPasswordTokenExpiration, email]);
+    }
+
+    static saveNewPasswordInfo = (userId, newPassword) => {
+        return db.execute('UPDATE users SET password = ?, reset_password_token = ?, reset_password_token_expiration = ? WHERE id = ?', [newPassword, null, null, userId]);
+    }
 }
 
 module.exports = User;
