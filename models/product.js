@@ -14,7 +14,7 @@ class Product {
         if (!this.id) {
             return db.execute('INSERT INTO products (name, image_url, price, description, user_id) VALUES (?, ?, ?, ?, ?)', [this.title, this.imageUrl, this.price, this.description, this.userId]);
         } else {
-            return db.execute('UPDATE products SET name = ?, image_url = ?, price = ?, description = ? WHERE id = ?', [this.title, this.imageUrl, this.price, this.description, this.id]);
+            return db.execute('UPDATE products SET name = ?, image_url = ?, price = ?, description = ? WHERE id = ? AND user_id = ?', [this.title, this.imageUrl, this.price, this.description, this.id, this.userId]);
         }
     }
 
@@ -30,8 +30,8 @@ class Product {
       return db.execute('SELECT * FROM products WHERE id = ?', [id]);
     }
 
-    static deleteById = (id) => {
-        return db.execute('DELETE FROM products WHERE id = ?', [id]);
+    static deleteById = (productId, userId) => {
+        return db.execute('DELETE FROM products WHERE id = ? AND user_id = ?', [productId, userId]);
     }
 }
 
