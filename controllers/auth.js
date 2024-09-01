@@ -3,6 +3,7 @@ const crypto = require('crypto');
 const bcrypt = require('bcrypt');
 const nodemailer = require('nodemailer');
 const { google } = require('googleapis');
+const { validationResult } = require('express-validator');
 
 const config = require('../config/config')
 const User = require('../models/user');
@@ -42,13 +43,25 @@ exports.getLogin = (req, res, next) => {
     res.render('shop/login', {
         docTitle: 'Login',
         path: '/login',
-        errorMessage: errorMessage
+        errorMessage: errorMessage,
+        oldInput: {email: '', password: ''},
+        validationErrors: []
     });
 }
 
 exports.postLogin = async (req, res, next) => {
     try {
         const {email, password} = req.body;
+        const errors = validationResult(req);
+        if (!errors.isEmpty()) {
+            return res.status(422).render('shop/login', {
+                docTitle: 'Login',
+                path: '/login',
+                errorMessage: errors.array()[0].msg,
+                oldInput: {email: email, password: password},
+                validationErrors: errors.array()
+            });
+        }
         const [userData, userFieldData] = await User.findByEmail(email);
         if (userData.length > 0) {
             const hashedPassword = userData[0].password;
@@ -93,13 +106,26 @@ exports.getSignup = (req, res, next) => {
     res.render('shop/signup', {
         docTitle: 'Sign Up',
         path: '/signup',
-        errorMessage: errorMessage
+        errorMessage: errorMessage,
+        oldInput: {email: '', password: '', confirmPassword: ''},
+        validationErrors: []
     });
 }
 
 exports.postSignup = async (req, res, next) => {
     try {
-        const {email, password} = req.body;
+        const {email, password, confirmPassword} = req.body;
+        const errors = validationResult(req);
+        if (!errors.isEmpty()) {
+            console.log('errors.array() ####', errors.array());
+            return res.status(422).render('shop/signup', {
+                docTitle: 'Sign Up',
+                path: '/signup',
+                errorMessage: errors.array()[0].msg,
+                oldInput: {email: email, password: password, confirmPassword: confirmPassword},
+                validationErrors: errors.array()
+            });
+        }
         const [userData, userFieldData] = await User.findByEmail(email);
         if (userData.length > 0) {
             req.flash('error', 'Email you entered is already used. Please enter different email.');

@@ -227,6 +227,11 @@ ul {
   margin: 16px 0;
 }
 
+.form-control input.invalid,
+.form-control textarea.invalid {
+  border-color: #FF0000;
+}
+
 label {
   font-size: 16px;
   line-height: 22px;
