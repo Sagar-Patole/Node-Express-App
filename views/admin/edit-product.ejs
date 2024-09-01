@@ -6,22 +6,49 @@
    <%- include('../includes/navigation.ejs') %>
 
     <main class="container">
+        <% if (errorMessage) { %>
+            <div class="notification error-notification"><%= errorMessage %></div>
+        <% } %>
         <form class="product-form" action="<% if (editMode) { %>/admin/edit-product<% } else { %>/admin/add-product<% } %>" method="POST">
             <div class="form-control">
                 <label for="title">Title</label>
-                <input type="text" name="title" id="title" value="<% if (editMode) { %><%= product.name %><% } %>">
+                <input
+                    class="<%= validationErrors.find(error => error.path === 'title') ? 'invalid' : '' %>"
+                    type="text"
+                    name="title"
+                    id="title"
+                    value="<% if (editMode || hasError) { %><%= product.name %><% } %>"
+                >
             </div>
             <div class="form-control">
                 <label for="imageUrl">Image URL</label>
-                <input type="text" name="imageUrl" id="imageUrl" value="<% if (editMode) { %><%= product.image_url %><% } %>">
+                <input
+                    class="<%= validationErrors.find(error => error.path === 'imageUrl') ? 'invalid' : '' %>"
+                    type="text"
+                    name="imageUrl"
+                    id="imageUrl"
+                    value="<% if (editMode || hasError) { %><%= product.image_url %><% } %>"
+                >
             </div>
             <div class="form-control">
                 <label for="price">Price</label>
-                <input type="number" name="price" id="price" step="0.01" value="<% if (editMode) { %><%= product.price %><% } %>">
+                <input
+                    class="<%= validationErrors.find(error => error.path === 'price') ? 'invalid' : '' %>"
+                    type="number"
+                    name="price"
+                    id="price"
+                    step="0.01"
+                    value="<% if (editMode || hasError) { %><%= product.price %><% } %>"
+                >
             </div>
             <div class="form-control">
                 <label for="description">Description</label>
-                <textarea name="description" id="description" rows="5"><% if (editMode) { %><%= product.description %><% } %></textarea>
+                <textarea
+                    class="<%= validationErrors.find(error => error.path === 'description') ? 'invalid' : '' %>"
+                    name="description"
+                    id="description"
+                    rows="5"
+                ><% if (editMode || hasError) { %><%= product.description %><% } %></textarea>
             </div>
             <% if (editMode) { %>
                 <div class="form-control">
