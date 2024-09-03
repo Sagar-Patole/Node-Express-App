@@ -15,7 +15,9 @@ class Order {
             }
             await db.query('INSERT INTO order_items (order_id, product_id, quantity) VALUES ?', [orderItems]);
         } catch (error) {
-            console.log(error);
+            const err = new Error(error);
+            err.httpStatusCode = 500;
+            return next(err);
         }
     }
 

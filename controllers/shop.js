@@ -10,8 +10,10 @@ exports.getIndex = (req, res, next) => {
             path: '/'
         });
     }).catch(error => {
-        console.log(error);
-    });;
+        const err = new Error(error);
+        err.httpStatusCode = 500;
+        return next(err);
+    });
 };
 
 exports.getAllProducts = (req, res, next) => {
@@ -22,8 +24,10 @@ exports.getAllProducts = (req, res, next) => {
             path: '/products'
         });
     }).catch(error => {
-        console.log(error);
-    });;
+        const err = new Error(error);
+        err.httpStatusCode = 500;
+        return next(err);
+    });
 };
 
 exports.getProductById = (req, res, next) => {
@@ -36,7 +40,9 @@ exports.getProductById = (req, res, next) => {
             product: product
         });
     }).catch(error => {
-        console.log(error);
+        const err = new Error(error);
+        err.httpStatusCode = 500;
+        return next(err);
     });
 }
 
@@ -63,7 +69,9 @@ exports.getCart = (req, res, next) => {
             cartItems: cart.cartItems
         });
     }).catch(error => {
-        console.log(error);
+        const err = new Error(error);
+        err.httpStatusCode = 500;
+        return next(err);
     });
 }
 
@@ -73,7 +81,9 @@ exports.postCart = (req, res, next) => {
     Cart.addProduct(cartId, productId).then(() => {
         res.redirect('/cart');
     }).catch(error => {
-        console.log(error);
+        const err = new Error(error);
+        err.httpStatusCode = 500;
+        return next(err);
     });
 }
 
@@ -83,7 +93,9 @@ exports.postDeleteCartItem = (req, res, next) => {
     Cart.deleteProduct(cartId, productId).then(() => {
         res.redirect('/cart');
     }).catch(error => {
-        console.log(error);
+        const err = new Error(error);
+        err.httpStatusCode = 500;
+        return next(err);
     });
 }
 
@@ -121,7 +133,9 @@ exports.getOrders = (req, res, next) => {
             orders: orders
         });
     }).catch(error => {
-        console.log(error);
+        const err = new Error(error);
+        err.httpStatusCode = 500;
+        return next(err);
     });
 }
 
@@ -132,7 +146,9 @@ exports.createOrder = (req, res, next) => {
         res.redirect('/orders');
         Cart.clearCart(cartId);
     }).catch(error => {
-        console.log(error);
+        const err = new Error(error);
+        err.httpStatusCode = 500;
+        return next(err);
     });
 }
 

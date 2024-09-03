@@ -13,7 +13,7 @@ const rootDir = require('./utils/path');
 const adminRoutes = require('./routes/admin');
 const shopRoutes = require('./routes/shop');
 const authRoutes = require('./routes/auth');
-const errorController = require('./controllers/error');
+const errorRoutes = require('./routes/error');
 
 const app = express();
 const sessionStore = new MySQLStore({
@@ -54,11 +54,20 @@ app.use((req, res, next) => {
 app.use('/admin', adminRoutes);
 app.use(shopRoutes);
 app.use(authRoutes);
+app.use(errorRoutes);
 
-app.use(errorController.get404);
+app.use((error, req, res, next) => {
+    // res.redirect('/500');
+    res.status(500).render('500', {
+        docTitle: 'Error',
+        path: '/error-page'
+    });
+});
 
 db.getConnection().then(() => {
     app.listen(config.database.port);
 }).catch(error => {
-    console.log(error);
+    const err = new Error(error);
+    err.httpStatusCode = 500;
+    return next(err);
 });

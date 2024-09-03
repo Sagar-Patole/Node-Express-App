@@ -28,7 +28,9 @@ const createTransporter = async () => {
             }
         });
     } catch (error) {
-        console.log(error);
+        const err = new Error(error);
+        err.httpStatusCode = 500;
+        return next(err);
     }
 }
 
@@ -84,7 +86,9 @@ exports.postLogin = async (req, res, next) => {
             res.redirect('/login');
         }
     } catch (error) {
-        console.log(error);
+        const err = new Error(error);
+        err.httpStatusCode = 500;
+        return next(err);
     }
 }
 
@@ -117,7 +121,6 @@ exports.postSignup = async (req, res, next) => {
         const {email, password, confirmPassword} = req.body;
         const errors = validationResult(req);
         if (!errors.isEmpty()) {
-            console.log('errors.array() ####', errors.array());
             return res.status(422).render('shop/signup', {
                 docTitle: 'Sign Up',
                 path: '/signup',
@@ -146,7 +149,9 @@ exports.postSignup = async (req, res, next) => {
             });
         }
     } catch (error) {
-        console.log(error);
+        const err = new Error(error);
+        err.httpStatusCode = 500;
+        return next(err);
     }
 }
 
@@ -208,7 +213,9 @@ exports.postResetPassword = async (req, res, next) => {
             res.redirect('/reset-password');
         }
     } catch (error) {
-        console.log(error);
+        const err = new Error(error);
+        err.httpStatusCode = 500;
+        return next(err);
     }
 }
 
@@ -242,7 +249,9 @@ exports.getNewPassword = async (req, res, next) => {
             res.redirect('/reset-password');
         }
     } catch (error) {
-        console.log(error);
+        const err = new Error(error);
+        err.httpStatusCode = 500;
+        return next(err);
     }
 }
 
@@ -265,6 +274,8 @@ exports.postNewPassword = async (req, res, next) => {
             res.redirect('/reset-password');
         }
     } catch (error) {
-        console.log(error);
+        const err = new Error(error);
+        err.httpStatusCode = 500;
+        return next(err);
     }
 }
