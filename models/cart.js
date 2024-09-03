@@ -29,7 +29,9 @@ class Cart {
                 await db.execute('INSERT INTO cart_items (cart_id, product_id, quantity) VALUES (?, ?, ?)', [cartId, productId, 1]);
             }
         } catch (error) {
-            console.log(error);
+            const err = new Error(error);
+            err.httpStatusCode = 500;
+            return next(err);
         }
     }
 
