@@ -1,3 +1,9 @@
+const fs = require('fs');
+const path = require('path');
+
+const PDFDocument = require('pdfkit');
+
+const rootDir = require('../utils/path');
 const Product = require('../models/product');
 const Cart = require('../models/cart');
 const Order = require('../models/order');
@@ -150,6 +156,41 @@ exports.createOrder = (req, res, next) => {
         err.httpStatusCode = 500;
         return next(err);
     });
+}
+
+exports.getInvoice = async (req, res, next) => {
+    try {
+        const {orderId} = req.params;
+        const invoiceName = 'invoice' + '-' + orderId + '.pdf';
+        const invoicePath = path.join(rootDir, 'data', 'invoices', invoiceName);
+        const [orderData, orderFieldData] = await Order.findById(orderId);
+        if (orderData.length > 0) {
+            if (orderData[0].user_id !== req.session.user.id) {
+                return next(new Error('Unauthorized access.'));
+            }
+            res.setHeader('Content-Type', 'application/pdf');
+            res.setHeader('Content-Disposition', 'inline; filename="' + invoiceName + '"');
+            const pdfDoc = new PDFDocument();
+            pdfDoc.pipe(fs.createWriteStream(invoicePath));
+            pdfDoc.pipe(res);
+            pdfDoc.fontSize(26).text('Invoice');
+            pdfDoc.text('------------------------------------------------');
+            let totalPrice = 0;
+            orderData.forEach(item => {
+                totalPrice = totalPrice + (item.price * item.quantity);
+                pdfDoc.fontSize(14).text(`${item.name} - ${item.quantity} x $${item.price}`);
+            });
+            pdfDoc.text('-------------------------------------------------------');
+            pdfDoc.fontSize(20).text(`Total Price: $${totalPrice}`);
+            pdfDoc.end();
+        } else {
+            throw new Error('No order found.');
+        }
+    } catch (error) {
+        const err = new Error(error);
+        err.httpStatusCode = 500;
+        return next(err);
+    }
 }
 
 exports.getCheckout = (req, res, next) => {

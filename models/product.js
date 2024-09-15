@@ -14,7 +14,11 @@ class Product {
         if (!this.id) {
             return db.execute('INSERT INTO products (name, image_url, price, description, user_id) VALUES (?, ?, ?, ?, ?)', [this.title, this.imageUrl, this.price, this.description, this.userId]);
         } else {
-            return db.execute('UPDATE products SET name = ?, image_url = ?, price = ?, description = ? WHERE id = ? AND user_id = ?', [this.title, this.imageUrl, this.price, this.description, this.id, this.userId]);
+            if (this.imageUrl) {
+                return db.execute('UPDATE products SET name = ?, image_url = ?, price = ?, description = ? WHERE id = ? AND user_id = ?', [this.title, this.imageUrl, this.price, this.description, this.id, this.userId]);
+            } else {
+                return db.execute('UPDATE products SET name = ?, price = ?, description = ? WHERE id = ? AND user_id = ?', [this.title, this.price, this.description, this.id, this.userId]);  
+            }
         }
     }
 

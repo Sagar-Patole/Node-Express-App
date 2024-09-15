@@ -13,7 +13,7 @@
                         <% for (order of orders) { %>
                             <div class="order">
                                 <li>
-                                    <p>Order - #<%= order.id %></p>
+                                    <p>Order - #<%= order.id %> <a href="/orders/<%= order.id %>">Invoice</a></p>
                                     <% for (orderItem of order.orderItems) { %>
                                         <div class="order-items">
                                             <ul>
