@@ -9,7 +9,7 @@
         <% if (errorMessage) { %>
             <div class="notification error-notification"><%= errorMessage %></div>
         <% } %>
-        <form class="product-form" action="<% if (editMode) { %>/admin/edit-product<% } else { %>/admin/add-product<% } %>" method="POST">
+        <form class="product-form" action="<% if (editMode) { %>/admin/edit-product<% } else { %>/admin/add-product<% } %>" method="POST" enctype="multipart/form-data">
             <div class="form-control">
                 <label for="title">Title</label>
                 <input
@@ -20,7 +20,7 @@
                     value="<% if (editMode || hasError) { %><%= product.name %><% } %>"
                 >
             </div>
-            <div class="form-control">
+            <!-- <div class="form-control">
                 <label for="imageUrl">Image URL</label>
                 <input
                     class="<%= validationErrors.find(error => error.path === 'imageUrl') ? 'invalid' : '' %>"
@@ -28,6 +28,15 @@
                     name="imageUrl"
                     id="imageUrl"
                     value="<% if (editMode || hasError) { %><%= product.image_url %><% } %>"
+                >
+            </div> -->
+            <div class="form-control">
+                <label for="image">Image</label>
+                <input
+                    type="file"
+                    name="image"
+                    id="image"
+                    class="file-input"
                 >
             </div>
             <div class="form-control">

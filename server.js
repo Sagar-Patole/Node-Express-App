@@ -6,10 +6,12 @@ const MySQLStore = require('express-mysql-session')(session);
 const bodyParser = require('body-parser');
 const csrf = require('csurf');
 const flash = require('connect-flash');
+const multer = require('multer');
 
 const config = require('./config/config');
 const db = require('./utils/database');
 const rootDir = require('./utils/path');
+const commonUtils = require('./utils/common');
 const adminRoutes = require('./routes/admin');
 const shopRoutes = require('./routes/shop');
 const authRoutes = require('./routes/auth');
@@ -29,13 +31,32 @@ const sessionStore = new MySQLStore({
     }
 }, db);
 
+const fileStorage = multer.diskStorage({
+    destination: (req, file, cb) => {
+        cb(null, 'assets/images');
+    },
+    filename: (req, file, cb) => {
+        cb(null, commonUtils.formatDateToIST(new Date()).replace(/:/g, '-') + '-' + file.originalname);
+    }
+});
+
+const fileFilter = (req, file, cb) => {
+    if (file.mimetype === 'image/png' || file.mimetype === 'image/jpg' || file.mimetype === 'image/jpeg') {
+        cb(null, true);
+    } else {
+        cb(null, false);
+    }
+}
+
 const csrfProtection = csrf();
 
 app.set('view engine', 'ejs');
 app.set('views', 'views');
 
 app.use(bodyParser.urlencoded({extended: false}));
+app.use(multer({storage: fileStorage, fileFilter: fileFilter}).single('image'));
 app.use(express.static(path.join(rootDir, 'public')));
+app.use('/assets/images', express.static(path.join(rootDir, 'assets/images')));
 app.use(session({
     secret: 'My secret key',
     resave: false,
@@ -57,11 +78,11 @@ app.use(authRoutes);
 app.use(errorRoutes);
 
 app.use((error, req, res, next) => {
-    // res.redirect('/500');
-    res.status(500).render('500', {
-        docTitle: 'Error',
-        path: '/error-page'
-    });
+    res.redirect('/500');
+    // res.status(500).render('500', {
+    //     docTitle: 'Error',
+    //     path: '/error-page'
+    // });
 });
 
 db.getConnection().then(() => {

@@ -5,10 +5,10 @@ const nodemailer = require('nodemailer');
 const { google } = require('googleapis');
 const { validationResult } = require('express-validator');
 
-const config = require('../config/config')
+const config = require('../config/config');
+const commonUtils = require('../utils/common');
 const User = require('../models/user');
 const Cart = require('../models/cart');
-const path = require('path');
 
 const oAuth2Client = new google.auth.OAuth2(config.oAuth2.clientId, config.oAuth2.clientSecret, config.oAuth2.redirectUri);
 oAuth2Client.setCredentials({refresh_token: config.oAuth2.refreshToken});
@@ -172,28 +172,10 @@ exports.getResetPasword = (req, res, next) => {
 
 exports.postResetPassword = async (req, res, next) => {
     try {
-        const formatDateToIST = (date) => {
-            const options = {
-                timeZone: 'Asia/Kolkata',
-                year: 'numeric',
-                month: '2-digit',
-                day: '2-digit',
-                hour: '2-digit',
-                minute: '2-digit',
-                second: '2-digit',
-                hour12: false
-            }
-
-            const istString = date.toLocaleString('en-IN', options);
-            const [datePart, timePart] = istString.split(', ');
-            const [day, month, year] = datePart.split('/');
-            const formattedDate = `${year}-${month}-${day} ${timePart}`;
-            return formattedDate;
-        }
         const { email } = req.body;
         const buffer = await crypto.randomBytes(32);
         const token = buffer.toString('hex');
-        const tokenExpiration = formatDateToIST(new Date(new Date().getTime() + (60 * 60 * 1000)));
+        const tokenExpiration = commonUtils.formatDateToIST(new Date(new Date().getTime() + (60 * 60 * 1000)));
         const [userData, userFieldData] = await User.findByEmail(email);
         if (userData.length > 0) {
             await User.saveResetPasswordInfo(email, token, tokenExpiration);

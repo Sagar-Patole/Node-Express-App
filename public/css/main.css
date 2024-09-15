@@ -262,6 +262,16 @@ input::placeholder {
   color: #B2B2B2;
 }
 
+.file-input {
+  padding-left: 0px;
+}
+
+input[type="file" i]::-webkit-file-upload-button {
+  width: 55%;
+  border: none;
+  height: 100%;
+}
+
 textarea {
   font-size: 16px;
   border: 1px solid gray;
