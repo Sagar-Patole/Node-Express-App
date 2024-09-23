@@ -22,12 +22,16 @@ class Product {
         }
     }
 
-    static fetchAll = (userId) => {
+    static fetchAll = (userId, limit, offset) => {
         if (userId) {
-            return db.execute('SELECT * FROM products WHERE user_id = ?', [userId]);
+            return db.execute('SELECT * FROM products where user_id = ?', [userId]);
         } else {
-            return db.execute('SELECT * FROM products');
+            return db.execute('CALL FetchProducts(?, ?)', [limit, offset]);
         }
+    }
+
+    static getNumberOfProducts = () => {
+        return db.execute('SELECT COUNT(*) AS totalItems FROM products');
     }
 
     static findById = (id) => {

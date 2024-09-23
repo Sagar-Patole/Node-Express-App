@@ -365,6 +365,27 @@ button:disabled {
   border: 1px solid #FF0000;
 }
 
+.pagination {
+  text-align: center;
+  margin-top: 20px;
+}
+
+.pagination > a {
+  text-decoration: none;
+  border: 1px solid #0731A1;
+  padding: 5px 10px;
+  margin-right: 10px;
+  color: #0731A1;
+}
+
+.pagination > a:hover,
+.pagination > a:active,
+.pagination > a.active {
+  background: #322FFD;
+  color: #FFFFFF;
+  border: none;
+}
+
 @media (min-width: 768px) {
   .main-header__nav {
     display: flex;
