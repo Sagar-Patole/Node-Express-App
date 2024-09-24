@@ -10,7 +10,7 @@ router.get('/login', authController.getLogin);
 router.post(
     '/login',
     [
-        check('email').isEmail().withMessage('Please enter a correct email address.').normalizeEmail(),
+        check('email').isEmail().withMessage('Please enter a correct email address.'),
         check('password', 'Password should be minimum of 6 charactors.').isLength({min: 6}).trim()
     ],
     authController.postLogin
@@ -23,7 +23,7 @@ router.get('/signup', authController.getSignup);
 router.post(
     '/signup',
     [
-        check('email').isEmail().normalizeEmail(),
+        check('email').isEmail(),
         check('password', 'Password should be minimum of 6 charactors.').isLength({min: 6}).trim(),
         check('confirmPassword').trim().custom((value, {req}) => {
             if (value !== req.body.password) {

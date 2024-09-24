@@ -2,7 +2,6 @@ const crypto = require('crypto');
 
 const bcrypt = require('bcrypt');
 const nodemailer = require('nodemailer');
-const { google } = require('googleapis');
 const { validationResult } = require('express-validator');
 
 const config = require('../config/config');
@@ -10,29 +9,13 @@ const commonUtils = require('../utils/common');
 const User = require('../models/user');
 const Cart = require('../models/cart');
 
-const oAuth2Client = new google.auth.OAuth2(config.oAuth2.clientId, config.oAuth2.clientSecret, config.oAuth2.redirectUri);
-oAuth2Client.setCredentials({refresh_token: config.oAuth2.refreshToken});
-
-const createTransporter = async () => {
-    try {
-        const accessToken = await oAuth2Client.getAccessToken();
-        return nodemailer.createTransport({
-            service: 'gmail',
-            auth: {
-                type: 'OAuth2',
-                user: config.oAuth2.email,
-                clientId: config.oAuth2.clientId,
-                clientSecret: config.oAuth2.clientSecret,
-                refreshToken: config.oAuth2.refreshToken,
-                accessToken: accessToken.token
-            }
-        });
-    } catch (error) {
-        const err = new Error(error);
-        err.httpStatusCode = 500;
-        return next(err);
+const transporter = nodemailer.createTransport({
+    service: 'gmail',
+    auth: {
+        user: config.mailConfiguration.email,
+        pass: config.mailConfiguration.password
     }
-}
+});
 
 exports.getLogin = (req, res, next) => {
     const message = req.flash('error');
@@ -74,7 +57,6 @@ exports.postLogin = async (req, res, next) => {
                 req.session.user = userData[0];
                 req.session.user.cartId = cartData[0].id;
                 req.session.save(err => {
-                    console.log(err);
                     res.redirect('/');
                 });
             } else {
@@ -94,7 +76,6 @@ exports.postLogin = async (req, res, next) => {
 
 exports.postLogout = (req, res, next) => {
     req.session.destroy((error) => {
-        console.log(error);
         res.redirect('/login');
     });
 } 
@@ -140,10 +121,9 @@ exports.postSignup = async (req, res, next) => {
             const cart = new Cart(newUserData.insertId);
             await cart.save();
             res.redirect('/login');
-            const transporter = await createTransporter();
             await transporter.sendMail({
                 to: email,
-                from: `${config.oAuth2.senderName} ${config.oAuth2.email}`,
+                from: `${config.mailConfiguration.senderName} ${config.mailConfiguration.email}`,
                 subject: 'Signup succeeded!',
                 html: '<h1>You successfully signed up!</h1>'
             });
@@ -180,10 +160,9 @@ exports.postResetPassword = async (req, res, next) => {
         if (userData.length > 0) {
             await User.saveResetPasswordInfo(email, token, tokenExpiration);
             res.redirect('/');
-            const transporter = await createTransporter();
             await transporter.sendMail({
                 to: email,
-                from: `${config.oAuth2.senderName} ${config.oAuth2.email}`,
+                from: `${config.mailConfiguration.senderName} ${config.mailConfiguration.email}`,
                 subject: 'Password Reset',
                 html: `
                     <p>You requested a password reset.</p>
