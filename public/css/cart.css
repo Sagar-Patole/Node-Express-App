@@ -1,10 +1,10 @@
-.cart .cart-items {
+.cart-items {
     width: 95%;
     max-width: 700px;
     margin: auto;
 }
 
-.cart .cart-item > li {
+.cart-item > li {
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -14,7 +14,7 @@
     margin-bottom: 16px;
 }
 
-.cart .cart-item > li > p {
+.cart-item > li > p {
     margin: 0px;
     font-size: 18px;
     font-weight: bold;
