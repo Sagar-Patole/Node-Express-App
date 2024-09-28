@@ -24,11 +24,14 @@
                         <% } %>
                     </ul>
                 </div>
-                <form action="/create-order" method="POST">
+                <!-- <form action="/create-order" method="POST">
                     <input type="hidden" name="_csrf" value="<%= csrfToken %>">
                     <input type="hidden" name="cartId" value="<%= cartId %>">
                     <button type="submit" class="btn btn-primary btn-centered">Place Order</button>
-                </form>
+                </form> -->
+                <div class="centered m-t-32">
+                    <a href="/checkout" class="btn btn-primary">Checkout</a>
+                </div>
             <% } else { %>
                 <h1>No Products Found!</h1>
             <% } %>
